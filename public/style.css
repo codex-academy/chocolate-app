@@ -1,7 +1,7 @@
 body {
 	font-family: arial;
 	font-size: 150%;
-	background: dodgerblue;
+	background: lightcyan;
 }
 
 .container {
@@ -39,4 +39,18 @@ thead {
 label {
 	display: inline-block;
 	width: 8em;
+}
+
+.chocolate {
+
+	font-size: 300%;
+	margin: auto 1em;
+	padding: 1em;
+	border: px salmon;
+	background-color: brown;
+	color : whitesmoke;
+	border-radius: 0.25em;
+
+	width: 10em;;
+
 }
