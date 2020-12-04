@@ -14,7 +14,7 @@ app.use(bodyParser.json()); // add  this line
 app.engine('handlebars', exphbs());
 app.set('view engine', 'handlebars');
 
-const connectionString = process.env.DATABASE_URL || 'postgresql://localhost:5432/choco';
+const connectionString = process.env.DATABASE_URL || 'postgresql://sneakygoblin:codex123@localhost:5432/choc';
 
 const pool = new Pool({
     connectionString
@@ -27,7 +27,6 @@ const chocolate = Chocolate(pool);
 app.get("/", async function (req, res) {
 
 	const chocolates = await chocolate.list();
-
 	res.render("index", { 
 		chocolates  
 	});
@@ -36,20 +35,24 @@ app.get("/", async function (req, res) {
 
 app.get("/add", async function (req, res) {
 
-	// const result = await pool.query("select * from chocolate");
+	const result = await pool.query("select * from chocolate");
 
 	res.render("add", { 
-		// chocolates : result.rows  
+		chocolates : result.rows  
 	});
 	
 });
 
 app.post("/add", async function (req, res) {
 
-	// const result = await pool.query("select * from chocolate");
+	const result = await pool.query("select * from chocolate");
+	const chocolates = await chocolate.list();
+	const qty=req.body.qty;
+	const name=req.body.name;
 
+chocolate.addChocolate(name,qty)
 	res.render("add", { 
-		// chocolates : result.rows  
+		chocolates 
 	});
 	
 });

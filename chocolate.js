@@ -1,5 +1,8 @@
 module.exports = function(pool) {
+async function addChocolate(name,qty){
+await pool.query('insert into chocolate (name,qty) values($1,$2)',[name,qty])
 
+}
 	async function list() {
 		const result = await pool.query("select * from chocolate");
 		return result.rows
@@ -31,6 +34,6 @@ module.exports = function(pool) {
 		incrementQtyByName,
 		decrementQtyById,
 		decrementQtyByName,
-		
+		addChocolate
 	}
 }
