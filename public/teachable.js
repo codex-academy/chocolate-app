@@ -7,6 +7,27 @@
     let model, webcam, labelContainer, maxPredictions;
 
 	const chocNameElem = document.querySelector(".chocName");
+	const chocolatesElem = document.querySelector(".chocolates");
+    
+    const startBtn = document.querySelector(".start");
+	const stopBtn = document.querySelector(".stop");
+
+    const chocolateListTemplate = Handlebars.compile(document.querySelector(".chocolateListTemplate").innerText);
+
+    function toggleVisibility(elem){
+        elem.classList.toggle("hidden");
+    }
+
+    function showChocolateList()  {
+        axios
+            .get("/api/list")
+            .then(function(response){
+                const chocolates = response.data.data;
+                chocolatesElem.innerHTML = chocolateListTemplate({
+                    chocolates
+                });
+            })
+    }
 
     // Load the image model and setup the webcam
     async function init() {
@@ -20,7 +41,6 @@
         model = await tmImage.load(modelURL, metadataURL);
         maxPredictions = model.getTotalClasses();
 
-
         // Convenience function to setup a webcam
         const flip = true; // whether to flip the webcam
         webcam = new tmImage.Webcam(200, 200, flip); // width, height, flip
@@ -30,11 +50,21 @@
         // setInterval(loop, 2000);
 
         // append elements to the DOM
+        document.getElementById("webcam-container").innerHTML = "";
         document.getElementById("webcam-container").appendChild(webcam.canvas);
-        labelContainer = document.getElementById("label-container");
-        for (let i = 0; i < maxPredictions; i++) { // and class labels
-            labelContainer.appendChild(document.createElement("div"));
-        }
+        
+        toggleVisibility(startBtn);
+        toggleVisibility(stopBtn);
+        
+    }
+
+    async function stop() {
+        await webcam.stop();
+        document.getElementById("webcam-container").innerHTML = "";
+        
+        toggleVisibility(startBtn);
+        toggleVisibility(stopBtn);
+        
     }
 
     async function loop() {
@@ -56,12 +86,12 @@
 				highestProb = pred.probability;
 				chocName = pred.className;
 			}
-		});
-        
-        const delayedStoreChocolate = _.debounce(function(){
-            storeChocolate(chocName);
-        }, 5000);
+        });
 
+        if (highestProb < 0.9){
+            return;
+        }
+                
 		if (chocName !== "Nothing"){
 
             throttledStoreChocolate(chocName);
@@ -71,11 +101,12 @@
     }
 
     // ensure that not too many chocolates are added...
-    const  throttledStoreChocolate = _.throttle(storeChocolate, 5000);
+    const  throttledStoreChocolate = _.throttle(storeChocolate, 2000);
+
+    showChocolateList();
 
     function storeChocolate(chocName) {
         const chocModeElem = document.querySelector(".mode:checked");
-
 
             if (chocModeElem.value === "buy") {
                 axios.post("/api/buy", {
@@ -89,7 +120,7 @@
                         chocNameElem.innerHTML = result.data.message;
                     }
                 })
-            } if (chocModeElem.value === "eat") {
+            } else if (chocModeElem.value === "eat") {
                 axios.post("/api/eat", {
                     name: chocName,
                     qty : 1
@@ -102,4 +133,5 @@
                     }
                 })
             }
+            showChocolateList();
     }

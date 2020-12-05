@@ -4,35 +4,76 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.7.6/handlebars.min.js" integrity="sha512-zT3zHcFYbQwjHdKjCu6OMmETx8fJA9S7E6W7kBeFxultf75OPTYUJigEKX58qgyQMi1m1EgenfjMXlRZG8BXaw==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.7.6/handlebars.min.js"
+        integrity="sha512-zT3zHcFYbQwjHdKjCu6OMmETx8fJA9S7E6W7kBeFxultf75OPTYUJigEKX58qgyQMi1m1EgenfjMXlRZG8BXaw=="
+        crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.0/axios.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.20/lodash.min.js" integrity="sha512-90vH1Z83AJY9DmlWa8WkjkV79yfS2n2Oxhsi2dZbIv0nC4E6m5AbH8Nh156kkM7JePmqD6tcZsfad1ueoaovww==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.20/lodash.min.js"
+        integrity="sha512-90vH1Z83AJY9DmlWa8WkjkV79yfS2n2Oxhsi2dZbIv0nC4E6m5AbH8Nh156kkM7JePmqD6tcZsfad1ueoaovww=="
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.3.1/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@0.8/dist/teachablemachine-image.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.7.6/handlebars.min.js"
+        integrity="sha512-zT3zHcFYbQwjHdKjCu6OMmETx8fJA9S7E6W7kBeFxultf75OPTYUJigEKX58qgyQMi1m1EgenfjMXlRZG8BXaw=="
+        crossorigin="anonymous"></script>
+
     <link rel="stylesheet" href="style.css">
     <title>Choco</title>
+    <script type="text/x-template" class="chocolateListTemplate">
+        <table>
+            <thead>
+                <tr>
+                    <th class="large">Name</th>
+                    <th class="large">Quantity</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{#each chocolates}}
+                <tr>
+                    <td class="large">{{name}}</td>
+                    <td class="large">{{qty}}</td>
+                </tr>
+                {{/each}}
+            </tbody>
+        </table>
+    </script>
 </head>
 
 <body>
-    <h1>Lets put the model here...</h1>
-    <div>
-        <div>Teachable Machine Image Model</div>
-<button type="button" onclick="init()">Start</button>
-<div id="webcam-container"></div>
-<div id="label-container"></div>
-<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.3.1/dist/tf.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@0.8/dist/teachablemachine-image.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.20/lodash.min.js" integrity="sha512-90vH1Z83AJY9DmlWa8WkjkV79yfS2n2Oxhsi2dZbIv0nC4E6m5AbH8Nh156kkM7JePmqD6tcZsfad1ueoaovww==" crossorigin="anonymous"></script>
 
+    <div class="container">
+        <h1>Teachable Chocolates</h1>
+        <div>
 
-<div>
-    <input type="radio" class="mode"  name="mode" value="buy"> Buy chocolates
-    <input type="radio" class="mode" name="mode" value="eat"> Eat chocolates
-</div>
+            <div class="controls">
+                
+                <div id="webcam-container"></div>
+                <div id="label-container"></div>
 
-<div class="chocName chocolate" >
+                <div class="controls">
+                    <button type="button" class="start" onclick="init()">Start</button>
+                    <button class="hidden stop"  type="button" onclick="stop()">Stop</button>
+                </div>
 
-</div>
+                <div>
+                    <input type="radio" class="mode" name="mode" value="buy" checked > Buy chocolates
+                    <input type="radio" class="mode" name="mode" value="eat"> Eat chocolates
+                </div>
+            </div>
+
+            <div class="controls" >
+                <div class="chocName chocolate"></div>
+            </div>
+
+            </div>
+
+            <div class="chocolates">
+
+            </div>
+        </div>
 
 </body>
 <link rel="stylesheet" href="style.css">
 <script src="teachable.js"></script>
+
 </html>

@@ -1,11 +1,11 @@
 body {
 	font-family: arial;
-	font-size: 150%;
+	/* font-size: 150%; */
 	background: lightcyan;
 }
 
 .container {
-	width: 80%;
+	width: 50%;
 	margin: auto;
 	background-color: white;
 	padding: 1em;
@@ -28,12 +28,27 @@ body {
 	border-radius: 0.25em;
 }
 
+table {
+	/* margin: 25px auto; */
+	border-collapse: collapse;
+	  border: 1px solid #eee;
+	  width: 100%;
+}
+
 th {
 	background-color: light-blue;
 }
 
 thead {
 	background-color: light-blue;
+}
+
+tbody tr:nth-child(odd) {
+	background: #eee;
+}
+
+td, tr {
+	padding : 1em;
 }
 
 label {
@@ -43,14 +58,40 @@ label {
 
 .chocolate {
 
-	font-size: 300%;
+	font-size: 125%;
 	margin: auto 1em;
 	padding: 1em;
-	border: px salmon;
-	background-color: brown;
-	color : whitesmoke;
+	/* border: px salmon; */
+	/* background-color: brown; */
+	color : salmon;
 	border-radius: 0.25em;
-
 	width: 10em;;
 
 }
+
+.controls {
+	padding : 1em;
+	/* border: 1px solid #eee; */
+	border-radius: 0.5em;
+}
+
+.controls > button[type='button'] {
+	margin: 0.5em;
+	padding: 0.5em;
+	width: 7em;
+	color: whitesmoke;
+	background-color: #0099ff;
+	border-radius: 0.25em;
+}
+
+.hidden {
+	display: none;
+}
+
+#webcam-container > canvas {
+	border: 1px solid #000;
+	border-radius: 0.25em;
+	margin : auto;
+}
+
+

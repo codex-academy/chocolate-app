@@ -1,7 +1,7 @@
 module.exports = function(pool) {
 
     async function list() {
-        const result = await pool.query("select * from chocolate");
+        const result = await pool.query("select * from chocolate order by name asc");
         return result.rows
     }
 

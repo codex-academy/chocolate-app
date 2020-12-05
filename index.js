@@ -26,18 +26,32 @@ const chocolate = Chocolate(pool);
 
 // after you added  this  restart the app
 app.get("/", async function (req, res) {
-
     const chocolates = await chocolate.list();
-
     res.render("index", {
         chocolates
+    });
+});
+
+app.get("/api/list", async function (req, res) {
+
+    const chocolates = await chocolate.list();
+    res.json({
+        status: "success",
+        data:chocolates
     });
 
 });
 
+
+
 app.get("/add", async function (req, res) {
 
-    // const result = await pool.query("select * from chocolate");
+    res.render("add", {
+        // chocolates : result.rows  
+    });
+
+});
+app.get("/add", async function (req, res) {
 
     res.render("add", {
         // chocolates : result.rows  
@@ -54,7 +68,6 @@ app.post("/add", async function (req, res) {
 
         await chocolate.insert(chocName, qty)
     }
-    let result = await chocolate.list()
 
     res.redirect("/")
 
@@ -68,7 +81,6 @@ app.post("/api/buy", async function (req, res) {
     if (chocName && qty !== "") {
 
         try {
-            console.log("adding")
 
             const doesChocolateExist = await chocolate.doesExist(chocName);
             if (!doesChocolateExist) {
@@ -80,7 +92,6 @@ app.post("/api/buy", async function (req, res) {
                 });
             } else {
                 await chocolate.incrementQtyByName(chocName);
-                console.log("updated");
                 return res.json({
                     status: "success",
                     message: "Bought " + chocName
