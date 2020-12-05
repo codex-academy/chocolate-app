@@ -23,14 +23,13 @@ const pool = new Pool({
 
 const chocolate = Chocolate(pool);
 
-
 // after you added  this  restart the app
-app.get("/", async function (req, res) {
-    const chocolates = await chocolate.list();
-    res.render("index", {
-        chocolates
-    });
-});
+// app.get("/", async function (req, res) {
+//     const chocolates = await chocolate.list();
+//     res.render("index", {
+//         chocolates
+//     });
+// });
 
 app.get("/api/list", async function (req, res) {
 
