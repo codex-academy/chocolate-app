@@ -1,7 +1,7 @@
 body {
 	font-family: arial;
 	/* font-size: 150%; */
-	background: lightcyan;
+	background: rgb(66, 175, 170);
 }
 
 .container {
@@ -58,19 +58,25 @@ label {
 
 .chocolate {
 
-	font-size: 125%;
-	margin: auto 1em;
-	padding: 1em;
+	font-size: 200%;
+	margin: auto 0em;
+	padding-bottom: 0.25em;
 	/* border: px salmon; */
 	/* background-color: brown; */
-	color : salmon;
+	color : rgb(32, 40, 158);
 	border-radius: 0.25em;
-	width: 10em;;
+	/* width: 10em; */
+
+}
+
+.correct {
+	color : rgb(32, 189, 32);
+	font-size: 300%;
 
 }
 
 .controls {
-	padding : 1em;
+	padding : 0.25em;
 	/* border: 1px solid #eee; */
 	border-radius: 0.5em;
 }

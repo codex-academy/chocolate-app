@@ -47,35 +47,40 @@
 
             <div>
                 <i>
-                    <img src="notes.png" width="200" alt="">
-                    Show me the right chocolate 4 times in a row to hear a Christmas song.
+                    I will keep count if you show me a <strong>Lunch Bar</strong>, <strong>Bar One</strong>, <strong>Tex</strong> or <strong>KitKat</strong> chocolate.
                 </i>
             </div>
 
             <div class="controls">
-
+                
                 <div id="webcam-container"></div>
                 <div id="label-container"></div>
 
                 <div class="controls">
                     <button type="button" class="start" onclick="init()">Start</button>
-                    <button type="button" class="hidden stop" onclick="stop()">Stop</button>
-                    <button type="button" class="restart hidden">Restart</button>
+                    <button class="hidden stop"  type="button" onclick="stop()">Stop</button>
                 </div>
 
+                <div>
+                    <input type="radio" class="mode" name="mode" value="buy" checked > Buy chocolates
+                    <input type="radio" class="mode" name="mode" value="eat"> Eat chocolates
+                </div>
             </div>
 
-            <div class="controls">
-                <div class="hidden question chocolate"></div>
+            <div class="controls" >
+                <div class="question chocolate"></div>
             </div>
 
-            <div class="controls">
-                <div class="chocName chocolate correct"></div>
+            <div class="controls" >
+                <div class="chocName chocolate"></div>
             </div>
 
+            </div>
+
+            <div class="chocolates">
+
+            </div>
         </div>
-
-    </div>
 
 </body>
 <link rel="stylesheet" href="style.css">
