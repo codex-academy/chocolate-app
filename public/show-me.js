@@ -83,6 +83,20 @@
         window.requestAnimationFrame(loop);
     }
 
+    function ChocolateGame() {
+
+        const showMeList = ["Tex", "Bar One", "Lunch Bar", "KitKat"]
+        let lookingForIndex = 0;
+
+        function getQuestion() {
+            return "Please show me a " + showMeList[lookingForIndex];
+        }
+
+        
+
+    }
+
+
     const showMeList = ["Tex", "Bar One", "Lunch Bar", "KitKat"]
     let lookingForIndex = 0
     questionElem.innerHTML = "Please show me a " + showMeList[lookingForIndex];
@@ -124,16 +138,15 @@
 			}
         });
 
-        if (highestProb < 0.9){
+        if (highestProb < 0.95){
             return;
         }
         
         checkForChocolateThrottled(chocName);
 		
-		
     }
 
-    const checkForChocolateThrottled = _.throttle(checkForChocolate, 2000);
+    const checkForChocolateThrottled = _.throttle(checkForChocolate, 4000);
 
     function checkForChocolate(chocName) {
 
