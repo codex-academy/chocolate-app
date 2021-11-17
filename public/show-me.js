@@ -1,181 +1,243 @@
 // More API functions here:
-    // https://github.com/googlecreativelab/teachablemachine-community/tree/master/libraries/image
+// https://github.com/googlecreativelab/teachablemachine-community/tree/master/libraries/image
 
-    // the link to your model provided by Teachable Machine export panel
-    const URL = "https://teachablemachine.withgoogle.com/models/ceJdALs4M/";
+// const { indexOf } = require("lodash");
 
-    let model, webcam, labelContainer, maxPredictions;
+// the link to your model provided by Teachable Machine export panel
+const URL = "https://teachablemachine.withgoogle.com/models/ceJdALs4M/";
 
-	const chocNameElem = document.querySelector(".chocName");
-	const chocolatesElem = document.querySelector(".chocolates");
-	const questionElem = document.querySelector(".question");
-	const debugElem = document.querySelector(".debugMessage");
-    const restartButton = document.querySelector(".restart");
+let model, webcam, labelContainer, maxPredictions;
 
-    const startBtn = document.querySelector(".start");
-	const stopBtn = document.querySelector(".stop");
+const chocNameElem = document.querySelector(".chocName");
+const chocolatesElem = document.querySelector(".chocolates");
+const questionElem = document.querySelector(".question");
+const debugElem = document.querySelector(".debugMessage");
+const restartButton = document.querySelector(".restart");
+const fileUpload = document.querySelector(".fileUpload");
 
-    const chocolateListTemplate = Handlebars.compile(document.querySelector(".chocolateListTemplate").innerText);
+const startBtn = document.querySelector(".start");
+const stopBtn = document.querySelector(".stop");
 
-    restartButton.addEventListener("click", function() {
-        lookingForIndex = -1;
-        toggleVisibility(restartButton);
-        showChocolateQuestion();
+const inputMode = document.querySelector("input[name='inputMode']:checked");
+
+const chocolateListTemplate = Handlebars.compile(document.querySelector(".chocolateListTemplate").innerText);
+
+restartButton.addEventListener("click", function () {
+    lookingForIndex = -1;
+    toggleVisibility(restartButton);
+    showChocolateQuestion();
+});
+
+
+function toggleVisibility(elem) {
+    elem.classList.toggle("hidden");
+}
+
+function showChocolateList() {
+    axios
+        .get("/api/list")
+        .then(function (response) {
+            const chocolates = response.data.data;
+            chocolatesElem.innerHTML = chocolateListTemplate({
+                chocolates
+            });
+        })
+}
+
+// Load the image model and setup the webcam
+async function init() {
+    const modelURL = URL + "model.json";
+    const metadataURL = URL + "metadata.json";
+
+    // load the model and metadata
+    // Refer to tmImage.loadFromFiles() in the API to support files from a file picker
+    // or files from your local hard drive
+    // Note: the pose library adds "tmImage" object to your window (window.tmImage)
+    model = await tmImage.load(modelURL, metadataURL);
+    maxPredictions = model.getTotalClasses();
+
+    if (inputMode && inputMode.value === 'webcam') {
+        setupWebCam();
+    } else {
+        toggleVisibility(fileUpload);
+    }
+
+    toggleVisibility(startBtn);
+    toggleVisibility(stopBtn);
+    toggleVisibility(questionElem);
+}
+
+async function setupWebCam() {
+    // Convenience function to setup a webcam
+    const flip = true; // whether to flip the webcam
+    webcam = new tmImage.Webcam(200, 200, flip); // width, height, flip
+    await webcam.setup(); // request access to the webcam
+    await webcam.play();
+    window.requestAnimationFrame(loop);
+    // setInterval(loop, 2000);
+
+    // append elements to the DOM
+    document.getElementById("webcam-container").innerHTML = "";
+    document.getElementById("webcam-container").appendChild(webcam.canvas);
+}
+
+
+async function stop() {
+    await webcam.stop();
+    document.getElementById("webcam-container").innerHTML = "";
+
+    toggleVisibility(startBtn);
+    toggleVisibility(stopBtn);
+
+}
+
+async function loop() {
+    webcam.update(); // update the webcam frame
+    await predict();
+    window.requestAnimationFrame(loop);
+}
+
+// function ChocolateGame() {
+
+//     const showMeList = ["Tex", "Bar One", "Lunch Bar", "KitKat"]
+//     let lookingForIndex = 0;
+
+//     function getQuestion() {
+//         return "Please show me a " + showMeList[lookingForIndex];
+//     }
+
+
+
+// }
+
+
+const showMeList = ["Tex", "Bar One", "Lunch Bar", "KitKat"]
+let lookingForIndex = 0
+questionElem.innerHTML = "Please show me a " + showMeList[lookingForIndex];
+const bell = new Audio('audio/bell.mp3');
+const jinglebells = new Audio('audio/jinglebells.mp3');
+const error = new Audio('audio/error.mp3');
+
+function showChocolateQuestion() {
+
+    lookingForIndex++;
+    if (lookingForIndex < showMeList.length) {
+        questionElem.innerHTML = "Please show me a " + currentlyLookingFor();
+    } else {
+        questionElem.innerHTML = "You know your chocolates!";
+        jinglebells.play();
+        toggleVisibility(restartButton)
+    }
+}
+
+function currentlyLookingFor() {
+    if (lookingForIndex < showMeList.length) {
+        return showMeList[lookingForIndex]
+    }
+    return "";
+}
+
+// run the webcam image through the image model
+async function predict() {
+    // predict can take in an image, video or canvas html element
+    const prediction = await model.predict(webcam.canvas);
+
+    let highestProb = 0;
+    let chocName = "";
+
+    prediction.forEach(function (pred) {
+        if (pred.probability > highestProb) {
+            highestProb = pred.probability;
+            chocName = pred.className;
+        }
     });
 
-
-    function toggleVisibility(elem){
-        elem.classList.toggle("hidden");
+    if (highestProb < 0.95) {
+        return;
     }
 
-    function showChocolateList()  {
-        axios
-            .get("/api/list")
-            .then(function(response){
-                const chocolates = response.data.data;
-                chocolatesElem.innerHTML = chocolateListTemplate({
-                    chocolates
-                });
-            })
-    }
+    checkForChocolateThrottled(chocName);
 
-    // Load the image model and setup the webcam
-    async function init() {
-        const modelURL = URL + "model.json";
-        const metadataURL = URL + "metadata.json";
+}
 
-        // load the model and metadata
-        // Refer to tmImage.loadFromFiles() in the API to support files from a file picker
-        // or files from your local hard drive
-        // Note: the pose library adds "tmImage" object to your window (window.tmImage)
-        model = await tmImage.load(modelURL, metadataURL);
-        maxPredictions = model.getTotalClasses();
+const checkForChocolateThrottled = _.throttle(checkForChocolate, 4000);
 
-        // Convenience function to setup a webcam
-        const flip = true; // whether to flip the webcam
-        webcam = new tmImage.Webcam(200, 200, flip); // width, height, flip
-        await webcam.setup(); // request access to the webcam
-        await webcam.play();
-        window.requestAnimationFrame(loop);
-        // setInterval(loop, 2000);
+function checkForChocolate(chocName) {
 
-        // append elements to the DOM
-        document.getElementById("webcam-container").innerHTML = "";
-        document.getElementById("webcam-container").appendChild(webcam.canvas);
-        
-        toggleVisibility(startBtn);
-        toggleVisibility(stopBtn);
-        toggleVisibility(questionElem);
-    }
+    if (chocName !== "Nothing") {
+        const lookingFor = currentlyLookingFor();
+        // debugElem.innerHTML = (lookingFor + " - " + chocName);
 
-    async function stop() {
-        await webcam.stop();
-        document.getElementById("webcam-container").innerHTML = "";
-        
-        toggleVisibility(startBtn);
-        toggleVisibility(stopBtn);
-        
-    }
+        if (lookingFor !== "" && chocName === lookingFor) {
+            console.log("=================================================");
+            webcam && webcam.pause();
+            chocNameElem.innerHTML = `That's right you showed me a ${lookingFor}!`;
+            bell.play();
+            chocName = "Nothing";
 
-    async function loop() {
-        webcam.update(); // update the webcam frame
-        await predict();
-        window.requestAnimationFrame(loop);
-    }
+            setTimeout(function () {
+                showChocolateQuestion()
+                chocNameElem.innerHTML = ""
+                webcam && webcam.play();
+            }, 2500);
 
-    function ChocolateGame() {
-
-        const showMeList = ["Tex", "Bar One", "Lunch Bar", "KitKat"]
-        let lookingForIndex = 0;
-
-        function getQuestion() {
-            return "Please show me a " + showMeList[lookingForIndex];
+        } else {
+            error.play();
         }
 
-        
-
+        // 
     }
 
+}
 
-    const showMeList = ["Tex", "Bar One", "Lunch Bar", "KitKat"]
-    let lookingForIndex = 0
-    questionElem.innerHTML = "Please show me a " + showMeList[lookingForIndex];
-    const bell = new Audio('audio/bell.mp3');
-    const jinglebells = new Audio('audio/jinglebells.mp3');
-    const error = new Audio('audio/error.mp3');
+// ensure that not too many chocolates are added...
 
-    function showChocolateQuestion() {
+// showChocolateList();
 
-        lookingForIndex++;
-        if (lookingForIndex < showMeList.length) {
-            questionElem.innerHTML = "Please show me a " + currentlyLookingFor();
-        }  else {
-            questionElem.innerHTML = "You know your chocolates!";
-            jinglebells.play();
-            toggleVisibility(restartButton)
+
+
+let fileInput = document.querySelector('#fileinput');
+let checkUploadedFile = document.querySelector('.checkUploadedFile');
+const canvas = document.querySelector('#canvas');
+
+checkUploadedFile.addEventListener('click', async function () {
+
+    const prediction = await model.predict(canvas);
+
+    let highestProb = 0;
+    let chocName = "";
+
+    prediction.forEach(function (pred) {
+        if (pred.probability > highestProb) {
+            highestProb = pred.probability;
+            chocName = pred.className;
         }
+    });
+
+    if (highestProb < 0.95) {
+        return;
     }
 
-    function currentlyLookingFor() {
-        if (lookingForIndex < showMeList.length){
-            return showMeList[lookingForIndex]
-        }
-        return "";
-    }
+    checkForChocolateThrottled(chocName);
 
-    // run the webcam image through the image model
-    async function predict() {
-        // predict can take in an image, video or canvas html element
-		const prediction = await model.predict(webcam.canvas);
-		
-		let highestProb = 0;
-		let chocName = "";
 
-		prediction.forEach(function(pred){
-			if (pred.probability > highestProb) {
-				highestProb = pred.probability;
-				chocName = pred.className;
-			}
-        });
+});
 
-        if (highestProb < 0.95){
-            return;
-        }
-        
-        checkForChocolateThrottled(chocName);
-		
-    }
+fileInput.addEventListener('change', function (ev) {
+    if (ev.target.files) {
+        let file = ev.target.files[0];
+        var reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onloadend = function (e) {
+            var image = new Image();
+            image.src = e.target.result;
+            image.onload = function (ev) {
 
-    const checkForChocolateThrottled = _.throttle(checkForChocolate, 4000);
-
-    function checkForChocolate(chocName) {
-
-        if (chocName !== "Nothing"){
-            const lookingFor = currentlyLookingFor();
-            // debugElem.innerHTML = (lookingFor + " - " + chocName);
-            
-            if (lookingFor !== "" && chocName === lookingFor) {
-                console.log("=================================================");
-                webcam.pause();
-                chocNameElem.innerHTML = `That's right you showed me a ${lookingFor}!`;
-                bell.play();
-                chocName = "Nothing";
-                
-                setTimeout(function(){
-                    showChocolateQuestion()
-                    chocNameElem.innerHTML = ""
-                    webcam.play();
-                }, 2500);
-
-            } else {
-                error.play();
+                canvas.width = image.width;
+                canvas.height = image.height;
+                var ctx = canvas.getContext('2d');
+                ctx.drawImage(image, 0, 0);
             }
-
-// 
-		}
-
+        }
     }
-
-    // ensure that not too many chocolates are added...
-
-    // showChocolateList();
+});

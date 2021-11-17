@@ -52,6 +52,15 @@
                 </i>
             </div>
 
+            
+            <div class="controls mt-1">
+                <strong>Input mode:</strong>
+                <div class=" mt-1">
+                    <input type="radio" class="inputMode" name="inputMode" value="webcam" > Web cam
+                    <input type="radio" inputMode="inputMode" name="inputMode" value="file" > File upload
+                </div>
+            </div>
+
             <div class="controls">
 
                 <div id="webcam-container"></div>
@@ -63,6 +72,14 @@
                     <button type="button" class="restart hidden">Restart</button>
                 </div>
 
+            </div>
+
+            <div class="fileUpload hidden controls" >
+                <div>
+                    <input type="file" id="fileinput" accept = "image/*">  
+                 </div>
+                 <canvas id= "canvas"></canvas>
+                 <button type="button" class="checkUploadedFile" >Check!</button>
             </div>
 
             <div class="controls">
